@@ -28,17 +28,17 @@ jobs:
           script: |
             const fs = require('fs');
             const path = require('path');
-            
+
             // 스터디원 정보
             const members = {
               'jihostudy': '김지호',
               'hyeonbinHur': '허현빈',
               'yeyounging': '공예영'
             };
-            
-            // 챕터 정보 (1-7장)
-            const chapters = ['1장', '2장', '3장', '4장', '5장', '6장', '7장'];
-            
+
+            // 챕터 정보 (1-16장)
+            const chapters = ['1장', '2장', '3장', '4장', '5장', '6장', '7장', '8장', '9장', '10장', '11장', '12장', '13장', '14장', '15장', '16장'];
+
             // 각 멤버의 챕터별 완료 상황 추적
             const progress = {};
             Object.keys(members).forEach(username => {
@@ -47,7 +47,7 @@ jobs:
                 progress[username][chapter] = false;
               });
             });
-            
+
             // 파일 시스템에서 학습 노트 확인
             function checkDirectory(dir) {
               if (!fs.existsSync(dir)) return;
@@ -80,21 +80,23 @@ jobs:
                 }
               }
             }
-            
+
             checkDirectory('.');
-            
-            // 진행률 테이블 생성
-            let progressTable = '\n## 📈 학습 진행률\n\n';
+
+            // 진행률 테이블 생성 (드롭다운으로 감싸기)
+            let progressTable = '\n## 📈 전체 학습 진행률\n\n';
+            progressTable += '<details>\n';
+            progressTable += '<summary>📊 챕터별 진행 현황 보기</summary>\n\n';
             progressTable += '| 챕터 | 김지호 | 허현빈 | 공예영 |\n';
             progressTable += '| --- | :---: | :---: | :---: |\n';
-            
+
             chapters.forEach(chapter => {
               progressTable += `| ${chapter} `;
               progressTable += `| ${progress['jihostudy'][chapter] ? '✅' : '⬜️'} `;
               progressTable += `| ${progress['hyeonbinHur'][chapter] ? '✅' : '⬜️'} `;
               progressTable += `| ${progress['yeyounging'][chapter] ? '✅' : '⬜️'} |\n`;
             });
-            
+
             // 전체 진행률 계산
             progressTable += '\n**전체 진행률**\n\n';
             Object.keys(members).forEach(username => {
@@ -103,18 +105,18 @@ jobs:
               const percentage = Math.round((completed / total) * 100);
               progressTable += `- ${members[username]}: ${completed}/${total} (${percentage}%)\n`;
             });
-            
-            progressTable += '\n---\n';
-            
+
+            progressTable += '\n</details>\n\n---\n';
+
             // README.md 읽기
             let readme = fs.readFileSync('README.md', 'utf8');
-            
+
             // 기존 진행률 섹션 제거 (있다면)
             const progressRegex = /\n## 📈 학습 진행률\n[\s\S]*?\n---\n/;
             if (progressRegex.test(readme)) {
               readme = readme.replace(progressRegex, '');
             }
-            
+
             // 스터디 인원 섹션 앞에 진행률 추가
             const studyMemberSection = '# 스터디 인원';
             if (readme.includes(studyMemberSection)) {
@@ -123,10 +125,10 @@ jobs:
               // 스터디 인원 섹션이 없으면 맨 끝에 추가
               readme += '\n' + progressTable;
             }
-            
+
             // README.md 업데이트
             fs.writeFileSync('README.md', readme);
-            
+
             console.log('✅ 진행률 업데이트 완료!');
 
       - name: 변경사항 커밋 및 푸시
@@ -140,5 +142,8 @@ jobs:
             git commit -m "📊 학습 진행률 자동 업데이트"
             git push
           fi
+<<<<<<< Updated upstream
 
 
+=======
+>>>>>>> Stashed changes
